@@ -9,12 +9,9 @@
 	var doubleQuoteRegex = /"/g;
 
 	CKEDITOR.plugins.add( 'autolink', {
-		requires: 'clipboard,textmatch',
+		requires: 'clipboard,textmatch,link',
 
 		init: function( editor ) {
-			var urlTemplate = new CKEDITOR.template( '<a href="{link}">{text}</a>' ),
-				emailTemplate = new CKEDITOR.template( '<a href="mailto:{link}">{text}</a>' );
-
 			editor.on( 'paste', function( evt ) {
 				if ( evt.data.dataTransfer.getTransferType( editor ) == CKEDITOR.DATA_TRANSFER_INTERNAL ) {
 					return;
@@ -75,38 +72,29 @@
 				}
 			}
 
-			function tryToEncodeLink( data ) {
-				// If enabled use link plugin to encode email link.
-				if ( editor.plugins.link ) {
-					var link = CKEDITOR.dom.element.createFromHtml( data ),
-						linkData = CKEDITOR.plugins.link.parseLinkAttributes( editor, link ),
-						attributes = CKEDITOR.plugins.link.getLinkAttributes( editor, linkData );
-
-					if ( !CKEDITOR.tools.isEmpty( attributes.set ) ) {
-						link.setAttributes( attributes.set );
-					}
-
-					if ( attributes.removed.length ) {
-						link.removeAttributes( attributes.removed );
-					}
-
-					link.removeAttribute( 'data-cke-saved-href' );
-
-					return link.getOuterHtml();
-				}
-				return data;
-			}
-
 			function getHtmlToInsert( text ) {
-				var opts = {
-						text: text,
-						link: text.replace( doubleQuoteRegex, '%22' )
-					},
-					template = opts.link.match( CKEDITOR.config.autolink_urlRegex ) ?
-						urlTemplate.output( opts )
-						: emailTemplate.output( opts );
+				var link = new CKEDITOR.dom.element( 'a' ),
+					value = text.replace( doubleQuoteRegex, '%22' );
 
-				return tryToEncodeLink( template );
+				value = value.match( CKEDITOR.config.autolink_urlRegex ) ? value : 'mailto:' + value;
+
+				link.setText( text );
+				link.setAttribute( 'href', value );
+
+				var linkData = CKEDITOR.plugins.link.parseLinkAttributes( editor, link ),
+					attributes = CKEDITOR.plugins.link.getLinkAttributes( editor, linkData );
+
+				if ( !CKEDITOR.tools.isEmpty( attributes.set ) ) {
+					link.setAttributes( attributes.set );
+				}
+
+				if ( attributes.removed.length ) {
+					link.removeAttributes( attributes.removed );
+				}
+
+				link.removeAttribute( 'data-cke-saved-href' );
+
+				return link.getOuterHtml();
 			}
 
 			function matchCallback( text, offset ) {
