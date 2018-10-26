@@ -169,7 +169,7 @@
 					itemTemplate = new CKEDITOR.template(
 						'<li class="cke_emoji-navigation_item" data-cke-emoji-group="{group}"><a href="#{href}" title="{name}" draggable="false" _cke_focus="1">' +
 						'<svg viewBox="0 0 34 34" aria-labelledby="{svgId}-title">' +
-						'<title id="{svgId}-title">{name}</title><use href="' + svgUrl + '#{svgId}"></use>' +
+						'<title id="{svgId}-title">{name}</title><use xlink:href="' + svgUrl + '#{svgId}" href="' + svgUrl + '#{svgId}"></use>' +
 						'</svg></a></li>'
 					);
 
@@ -281,7 +281,8 @@
 				if ( CKEDITOR.env.ie && CKEDITOR.env.version < 12 ) {
 					return '<span class="cke_emoji-search_loupe" aria-hidden="true" style="background-image:url(' + loupePngUrl + ');"></span>';
 				} else {
-					return '<svg viewBox="0 0 34 34" role="img" aria-hidden="true" class="cke_emoji-search_loupe"><use href="' + loupeSvgUrl + '#cke4-icon-emoji-10"></use></svg>';
+					return '<svg viewBox="0 0 34 34" role="img" aria-hidden="true" class="cke_emoji-search_loupe">' +
+						'<use xlink:href="' + loupeSvgUrl + '#cke4-icon-emoji-10" href="' + loupeSvgUrl + '#cke4-icon-emoji-10"></use></svg>';
 				}
 			},
 			getEmojiSections: function() {
